@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void authFace() {
 
-       LoginButton loginButton  = (LoginButton) findViewById(R.id.login_button);
+       final LoginButton loginButton  = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions("public_profile");
        // loginButton.setReadPermissions("email");
 
@@ -67,27 +67,44 @@ public class MainActivity extends AppCompatActivity {
                             printLog("Name is "+currentProfile.getLastName());
                             printLog(currentProfile.getId());
                             mProfileTracker.stopTracking();
-
                         }
+
                     };
                 }
-                // App code
                 printLog("OK !!!");
                 printLog("Token!: " + loginResult.getAccessToken());
                 Profile profile = Profile.getCurrentProfile();
                //printLog("name: " + Profile.getCurrentProfile().getName());
 
+
+                GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject me, GraphResponse response) {
+                                if (response.getError() != null) {
+                                    // handle error
+                                } else {
+                                    // get email and id of the user
+                                    String email = me.optString("email");
+                                    String id = me.optString("id");
+                                    printLog("EMAIL: " + email );
+                                }
+                            }
+                        }).executeAsync();
+
+
+
             }
 
             @Override
             public void onCancel() {
-                printLog("CANCEL! !!!");
+                printLog("CANCEL!");
                 // App code
             }
 
             @Override
             public void onError(FacebookException exception) {
-                printLog("ERROR !!!\r\n"+ exception.getMessage());
+                printLog("ERROR !\r\n"+ exception.getMessage());
                 // App code
             }
         });
